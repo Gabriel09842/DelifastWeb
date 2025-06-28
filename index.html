@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delifast - Tu Delivery Rápido</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom Purple Theme for Delifast */
+        :root {
+            --primary-purple: #6F2DBD; /* Darker Purple */
+            --light-purple: #8A4DC4;  /* Lighter Purple */
+            --bg-light-purple: #F3ECFA; /* Very light background purple */
+            --text-dark: #2D0F4B; /* Dark text for contrast */
+            --accent-green: #34D399; /* A fresh accent for positive actions */
+            --gray-text: #6B7280;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light-purple);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        /* Main app container on larger screens */
+        .app-container {
+            width: 100%;
+            max-width: 450px; /* Typical mobile width */
+            background-color: #fff;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full height on mobile */
+            position: relative;
+        }
+
+        /* Responsive adjustments */
+        @media (min-width: 768px) {
+            body {
+                align-items: center; /* Center app vertically on larger screens */
+            }
+            .app-container {
+                min-height: 800px; /* Fixed height for desktop preview */
+                height: 90vh; /* Max height on desktop */
+            }
+        }
+
+        /* Hide screens by default, show active one */
+        .screen {
+            display: none;
+            flex-grow: 1; /* Allow screen content to take available space */
+            overflow-y: auto; /* Enable scrolling for screen content */
+            padding-bottom: 70px; /* Space for fixed bottom nav */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Sticky header and fixed footer */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #fff; /* Ensure header content is visible */
+            padding-bottom: 0.5rem; /* Small padding at bottom of header */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+        }
+
+        .navbar {
+            position: fixed; /* Changed from sticky to fixed */
+            bottom: 0;
+            left: 50%; /* Center the navbar */
+            transform: translateX(-50%); /* Center the navbar */
+            width: 100%;
+            max-width: 450px; /* Match app-container max-width */
+            background-color: #fff;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+            z-index: 20;
+            border-top-left-radius: 20px; /* Rounded corners for fixed nav */
+            border-top-right-radius: 20px; /* Rounded corners for fixed nav */
+        }
+
+        /* Custom scrollbar for webkit browsers */
+        .screen::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .screen::-webkit-scrollbar-track {
+            background: var(--bg-light-purple);
+            border-radius: 10px;
+        }
+
+        .screen::-webkit-scrollbar-thumb {
+            background: var(--light-purple);
+            border-radius: 10px;
+        }
+
+        .screen::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-purple);
+        }
+
+        /* Styling for the quantity controls */
+        .quantity-control button {
+            @apply bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-bold text-lg;
+            transition: background-color 0.2s;
+        }
+        .quantity-control button:hover {
+            @apply bg-gray-300;
+        }
+
+        /* Smooth transitions for button hovers/taps */
+        button, a, .cursor-pointer {
+            transition: transform 0.1s ease-in-out, background-color 0.2s ease-in-out;
+        }
+        button:active, a:active, .cursor-pointer:active {
+            transform: scale(0.98);
+        }
+
+        /* Modal styling */
+        .modal {
+    display: none; /* Asegura que no se muestre por defecto */
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+    align-items: center;
+    justify-content: center;
+}
+
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Style for the Delifast logo to match the purple theme */
+        #delifastLogo {
+            filter: invert(19%) sepia(91%) saturate(1917%) hue-rotate(253deg) brightness(85%) contrast(87%);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- Modals -->
+        <div id="confirmationModal" class="modal">
+            <div class="modal-content">
+                <span class="close-button" onclick="closeModal('confirmationModal')">&times;</span>
+                <p id="modalMessage" class="text-xl font-semibold mb-4"></p>
+                <button class="bg-[var(--primary-purple)] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[var(--light-purple)]" onclick="closeModal('confirmationModal')">Aceptar</button>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <section id="homeScreen" class="screen active">
+            <div class="header p-4 pb-2">
+                <div class="flex justify-between items-center mb-4">
+                    <!-- Delifast Logo -->
+                    <img id="delifastLogo" src="delifast.png" alt="Delifast Logo" class="h-8">
+                    <div class="relative">
+                        <!-- Delivery Man Avatar -->
+                        <img src="https://placehold.co/40x40/6F2DBD/FFFFFF?text=DM" alt="Delivery Man Avatar" class="w-10 h-10 rounded-full border-2 border-[var(--primary-purple)]">
+                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                    </div>
+                </div>
+                <div class="relative">
+                    <!-- Search input: Calls loadCategory('all') to show all businesses when focused -->
+                    <input type="text" placeholder="¿Qué se te antoja hoy?" class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200" onfocus="loadCategory('all')">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+            </div>
+
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <!-- Categories -->
+                <h2 class="text-xl font-bold text-[var(--text-dark)] my-4">Categorías</h2>
+                <div id="categoryGrid" class="grid grid-cols-3 gap-3 mb-6">
+                    <!-- Category cards will be dynamically generated here -->
+                </div>
+
+                <!-- Featured Restaurants -->
+                <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">Restaurantes Destacados</h2>
+                <div id="featuredRestaurantsList" class="space-y-4">
+                    <!-- Featured restaurant cards will be dynamically generated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Restaurant List Screen (for search/category results) -->
+        <section id="restaurantListScreen" class="screen">
+            <div class="header p-4 pb-2 flex items-center">
+                <!-- Back button for restaurant list screen: goes back to home -->
+                <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('homeScreen')"><i class="fas fa-arrow-left"></i></button>
+                <input type="text" placeholder="Buscar negocios..." class="flex-grow pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200">
+                <i class="fas fa-search absolute left-14 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <!-- Title will be updated dynamically by loadCategory function -->
+                <h2 class="text-2xl font-bold text-[var(--text-dark)] mb-4"></h2>
+                <div id="allBusinessesList" class="space-y-4">
+                    <!-- All business cards will be loaded here dynamically by loadCategory -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Restaurant Details Screen -->
+        <section id="restaurantDetailsScreen" class="screen">
+            <div class="header p-4 pb-2">
+                <!-- Back button for restaurant details: goes back to the last category list -->
+                <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="loadCategory(lastCategoryFilter)"><i class="fas fa-arrow-left"></i></button>
+                <!-- Restaurant cover image will be dynamically updated by JS -->
+                <img id="restaurantCover" src="" alt="Restaurant Cover" onerror="this.onerror=null;this.src='https://placehold.co/400x200/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-48 object-cover rounded-xl mb-4 shadow-md">
+                <h2 id="restaurantName" class="text-3xl font-bold text-[var(--text-dark)] mb-2"></h2>
+                <p id="restaurantCuisine" class="text-gray-600 text-md mb-2"></p>
+                <div class="flex items-center text-sm text-gray-600 mb-4">
+                    <i class="fas fa-star text-yellow-400 mr-1"></i> <span id="restaurantRating"></span>
+                    <span class="mx-2">•</span> <i class="fas fa-motorcycle text-[var(--primary-purple)] mr-1"></i> <span id="restaurantDeliveryTime"></span>
+                </div>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Menú</h3>
+                <div id="restaurantMenu" class="space-y-4">
+                    <!-- Menu items will be loaded here dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Product Details Modal (simulated as a full screen for mobile flow) -->
+        <section id="productDetailsScreen" class="screen">
+            <div class="header p-4 pb-2">
+                <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="showScreen('restaurantDetailsScreen')"><i class="fas fa-arrow-left"></i></button>
+                <!-- Product image will be dynamically updated by JS -->
+                <img id="productImage" src="" alt="Product Image" onerror="this.onerror=null;this.src='https://placehold.co/400x200/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-56 object-cover rounded-xl mb-4 shadow-md">
+                <h2 id="productName" class="text-3xl font-bold text-[var(--text-dark)] mb-2"></h2>
+                <p id="productDescription" class="text-gray-600 text-md mb-4"></p>
+                <p class="text-2xl font-bold text-[var(--primary-purple)] mb-4"><span id="productPrice"></span></p>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <div class="flex items-center justify-center space-x-4 mb-6">
+                    <button class="quantity-control" onclick="updateQuantity(-1)"><i class="fas fa-minus"></i></button>
+                    <span id="productQuantity" class="text-2xl font-bold text-[var(--text-dark)]">1</span>
+                    <button class="quantity-control" onclick="updateQuantity(1)"><i class="fas fa-plus"></i></button>
+                </div>
+                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="addToCartFromProduct()">
+                    Agregar al carrito - $<span id="totalProductPrice"></span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Cart Screen -->
+        <section id="cartScreen" class="screen">
+            <div class="header p-4 pb-2">
+                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Tu Carrito</h2>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <div id="cartItems" class="space-y-4">
+                    <!-- Cart items will be loaded here -->
+                    <p id="emptyCartMessage" class="text-center text-gray-500 text-lg mt-8">Tu carrito está vacío.</p>
+                </div>
+            </div>
+            <div class="p-4 bg-white border-t border-gray-100 sticky bottom-[70px] w-full max-w-[450px]">
+                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)] mb-4">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)] mb-4">
+                    <span>Costo de envío:</span>
+                    <span>$3.50</span>
+                </div>
+                <div class="flex justify-between items-center text-xl font-bold text-[var(--primary-purple)] mb-6">
+                    <span>Total:</span>
+                    <span id="cartTotal">$3.50</span>
+                </div>
+                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="showScreen('checkoutScreen')">
+                    Proceder al Pago
+                </button>
+            </div>
+        </section>
+
+        <!-- Checkout Screen -->
+        <section id="checkoutScreen" class="screen">
+            <div class="header p-4 pb-2 flex items-center">
+                <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('cartScreen')"><i class="fas fa-arrow-left"></i></button>
+                <h2 class="text-3xl font-bold text-[var(--primary-purple)]">Checkout</h2>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Dirección de Entrega</h3>
+                <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+                    <p class="font-semibold text-[var(--text-dark)]">Mi Casa</p>
+                    <p class="text-gray-600">Av. Siempre Viva 742, Springfield</p>
+                    <button class="text-[var(--light-purple)] mt-2 text-sm">Cambiar</button>
+                </div>
+
+                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Método de Pago</h3>
+                <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
+                    <div class="flex items-center mb-2">
+                        <input type="radio" id="card" name="paymentMethod" value="card" class="form-radio text-[var(--primary-purple)] h-5 w-5" checked>
+                        <label for="card" class="ml-3 text-lg text-[var(--text-dark)]">Tarjeta de Crédito/Débito</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="radio" id="cash" name="paymentMethod" value="cash" class="form-radio text-[var(--primary-purple)] h-5 w-5">
+                        <label for="cash" class="ml-3 text-lg text-[var(--text-dark)]">Efectivo</label>
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Resumen del Pedido</h3>
+                <div id="checkoutSummary" class="bg-white p-4 rounded-xl shadow-sm space-y-2 mb-6">
+                    <!-- Summary items will be loaded here -->
+                </div>
+
+                <div class="flex justify-between items-center text-xl font-bold text-[var(--primary-purple)] mb-6">
+                    <span>Total a Pagar:</span>
+                    <span id="checkoutTotal">$0.00</span>
+                </div>
+
+                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="placeOrder()">
+                    Confirmar Pedido
+                </button>
+            </div>
+        </section>
+
+        <!-- Orders Screen -->
+        <section id="ordersScreen" class="screen">
+            <div class="header p-4 pb-2">
+                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Mis Pedidos</h2>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <div id="currentOrders" class="mb-6">
+                    <h3 class="text-xl font-bold text-[var(--text-dark)] mb-3">Pedidos Activos</h3>
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
+                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF987654</p>
+                        <p class="text-sm text-gray-600">La Piazza Italiana - En camino</p>
+                        <p class="text-sm text-[var(--primary-purple)] font-bold">$35.00</p>
+                    </div>
+                    <p id="noCurrentOrders" class="text-center text-gray-500 text-lg mt-8 hidden">No tienes pedidos activos.</p>
+                </div>
+
+                <div id="pastOrders">
+                    <h3 class="text-xl font-bold text-[var(--text-dark)] mb-3">Historial de Pedidos</h3>
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
+                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF123456</p>
+                        <p class="text-sm text-gray-600">Kyoto Sushi - Entregado</p>
+                        <p class="text-sm text-[var(--primary-purple)] font-bold">$28.50</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
+                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF789012</p>
+                        <p class="text-sm text-gray-600">Green Bites - Entregado</p>
+                        <p class="text-sm text-[var(--primary-purple)] font-bold">$22.00</p>
+                    </div>
+                    <p id="noPastOrders" class="text-center text-gray-500 text-lg mt-8 hidden">No tienes pedidos anteriores.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Screen -->
+        <section id="profileScreen" class="screen">
+            <div class="header p-4 pb-2">
+                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Mi Perfil</h2>
+            </div>
+            <div class="flex-grow p-4 pt-0 overflow-y-auto">
+                <div class="flex flex-col items-center mb-6">
+                    <!-- User Avatar -->
+                    <img src="https://placehold.co/100x100/6F2DBD/FFFFFF?text=User" alt="User Avatar" class="w-24 h-24 rounded-full border-4 border-[var(--primary-purple)] mb-3">
+                    <h3 class="text-2xl font-bold text-[var(--text-dark)]">Usuario Delifast</h3>
+                    <p class="text-gray-600">usuario@example.com</p>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <h4 class="font-semibold text-[var(--text-dark)] mb-3">Información Personal</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Nombre:</span>
+                            <span>Juan Pérez</span>
+                        </li>
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Teléfono:</span>
+                            <span>+51 987 654 321</span>
+                        </li>
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Dirección:</span>
+                            <span>Av. Siempre Viva 742</span>
+                        </li>
+                    </ul>
+                    <button class="text-[var(--light-purple)] mt-4 text-sm">Editar Información</button>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <h4 class="font-semibold text-[var(--text-dark)] mb-3">Configuración</h4>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Notificaciones</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" value="" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--light-purple)] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--primary-purple)]"></div>
+                            </label>
+                        </li>
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Métodos de Pago</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </li>
+                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                            <span>Ayuda y Soporte</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </li>
+                    </ul>
+                </div>
+
+                <button class="w-full bg-red-500 text-white text-lg py-3 rounded-full shadow-lg hover:bg-red-600 transition duration-200">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="navbar flex justify-around items-center py-3 px-2">
+            <button class="flex flex-col items-center text-[var(--primary-purple)] active-nav" onclick="showScreen('homeScreen')">
+                <i class="fas fa-home text-xl mb-1"></i>
+                <span class="text-xs font-medium">Inicio</span>
+            </button>
+            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)]" onclick="showScreen('ordersScreen')">
+                <i class="fas fa-receipt text-xl mb-1"></i>
+                <span class="text-xs font-medium">Pedidos</span>
+            </button>
+            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)] relative" onclick="showScreen('cartScreen')">
+                <i class="fas fa-shopping-cart text-xl mb-1"></i>
+                <span class="text-xs font-medium">Carrito</span>
+                <span id="cartItemCount" class="absolute top-0 right-0 -mt-1 -mr-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            </button>
+            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)]" onclick="showScreen('profileScreen')">
+                <i class="fas fa-user text-xl mb-1"></i>
+                <span class="text-xs font-medium">Perfil</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        // Global data stores (simulating a backend)
+        const restaurantsData = {
+            'restaurant1': {
+                name: 'La Piazza Italiana',
+                cuisine: 'Pasta, Pizza, Vino',
+                type: 'Italiana',
+                rating: '4.8 (500+)',
+                deliveryTime: '25-35 min',
+                cover: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item1', name: 'Pizza Margherita', description: 'La clásica pizza con tomate, mozzarella y albahaca.', price: 12.50, image: 'https://images.unsplash.com/photo-1598023696416-0193a0bcd302?q=80&w=936&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item2', name: 'Lasagna Bolognesa', description: 'Capas de pasta, carne y bechamel, horneada a la perfección.', price: 14.00, image: 'https://plus.unsplash.com/premium_photo-1726783346698-aeeee98bd358?q=80&w=853&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item3', name: 'Tiramisú', description: 'Postre italiano clásico con café y mascarpone.', price: 6.00, image: 'https://plus.unsplash.com/premium_photo-1695028378225-97fbe39df62a?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            'restaurant2': {
+                name: 'Kyoto Sushi',
+                cuisine: 'Sushi, Rolls, Sashimi',
+                type: 'Japonesa',
+                rating: '4.9 (700+)',
+                deliveryTime: '30-40 min',
+                cover: 'https://plus.unsplash.com/premium_photo-1668146927669-f2edf6e86f6f?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item4', name: 'Combo Nigiri (12 pzs)', description: 'Selección variada de nigiri fresco.', price: 20.00, image: 'https://images.unsplash.com/photo-1637074930269-089fde202b57?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item5', name: 'Roll California (8 pzs)', description: 'Aguacate, cangrejo y pepino.', price: 10.50, image: 'https://images.unsplash.com/photo-1563282397-cdc218eccfda?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item6', name: 'Sashimi de Salmón (6 pzs)', description: 'Finas láminas de salmón fresco.', price: 18.00, image: 'https://images.unsplash.com/photo-1638866381709-071747b518c8?q=80&w=812&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            'restaurant3': {
+                name: 'Green Bites',
+                cuisine: 'Ensaladas, Bowls, Jugos',
+                type: 'Saludable',
+                rating: '4.7 (300+)',
+                deliveryTime: '20-30 min',
+                cover: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item7', name: 'Bowl de Quinoa', description: 'Quinoa, vegetales asados, aguacate y aderezo de limón.', price: 11.00, image: 'https://images.unsplash.com/photo-1615865417491-9941019fbc00?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item8', name: 'Ensalada César con Pollo', description: 'Lechuga romana, crutones, parmesano y pollo a la parrilla.', price: 10.00, image: 'https://images.unsplash.com/photo-1607532941433-304659e8198a?q=80&w=778&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item9', name: 'Jugo Verde Detox', description: 'Manzana, espinaca, apio y jengibre.', price: 5.50, image: 'https://plus.unsplash.com/premium_photo-1675011400509-5e39c4c17309?q=80&w=406&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            'restaurant4': {
+                name: 'Taco Loco Mexicano',
+                cuisine: 'Tacos, Burritos, Quesadillas',
+                type: 'Mexicana',
+                rating: '4.5 (250+)',
+                deliveryTime: '30-45 min',
+                cover: 'https://plus.unsplash.com/premium_photo-1681406995059-972cf4e86568?q=80&w=387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item10', name: 'Tacos al Pastor (3)', description: 'Con cerdo marinado, piña y cilantro.', price: 9.00, image: 'https://plus.unsplash.com/premium_photo-1681406994990-e16f7e02e027?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item11', name: 'Burrito Suizo', description: 'Carne, arroz, frijoles y queso gratinado.', price: 11.50, image: 'https://images.unsplash.com/photo-1662116765994-1e4200c43589?q=80&w=1332&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item12', name: 'Nachos Supreme', description: 'Totopos, queso, jalapeños, frijoles y crema.', price: 8.50, image: 'https://images.unsplash.com/photo-1464219222984-216ebffaaf85?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            'restaurant5': {
+                name: 'Burger Joint',
+                cuisine: 'Hamburguesas, Papas Fritas, Malteadas',
+                type: 'Americana',
+                rating: '4.6 (600+)',
+                deliveryTime: '20-30 min',
+                cover: 'https://images.unsplash.com/photo-1572802419224-296b0aeee0d9?q=80&w=815&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item13', name: 'Classic Cheeseburger', description: 'Carne, queso cheddar, lechuga, tomate y pepinillos.', price: 13.00, image: 'https://images.unsplash.com/photo-1547584370-2cc98b8b8dc8?q=80&w=871&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item14', name: 'Papas Fritas Grandes', description: 'Papas crujientes y saladas.', price: 4.00, image: 'https://images.unsplash.com/photo-1518013431117-eb1465fa5752?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item15', name: 'Malteada de Chocolate', description: 'Clásica malteada con helado de chocolate.', price: 6.50, image: 'https://plus.unsplash.com/premium_photo-1667544654787-cd984212004d?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            'restaurant6': {
+                name: 'The Coffee Spot',
+                cuisine: 'Café, Pastelería, Desayunos',
+                type: 'Cafetería',
+                rating: '4.7 (400+)',
+                deliveryTime: '15-25 min',
+                cover: 'https://plus.unsplash.com/premium_photo-1675435644687-562e8042b9db?q=80&w=449&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: [
+                    { id: 'item16', name: 'Latte Caliente', description: 'Café espresso con leche espumada.', price: 4.00, image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?q=80&w=1337&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item17', name: 'Croissant de Almendras', description: 'Croissant recién horneado con relleno de almendras.', price: 3.50, image: 'https://images.unsplash.com/photo-1649542181703-33cc4f373b28?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' },
+                    { id: 'item18', name: 'Bowl de Avena con Frutas', description: 'Avena caliente con frutas frescas y miel.', price: 7.00, image: 'https://images.unsplash.com/photo-1498507297833-5373e346b4e0?q=80&w=725&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D' }
+                ]
+            },
+            // New categories with example businesses
+            'supermarket1': {
+                name: 'MegaMart',
+                cuisine: 'Abarrotes, Frescos, Hogar',
+                type: 'Supermercado',
+                rating: '4.6 (1200+)',
+                deliveryTime: '45-60 min',
+                cover: 'https://plus.unsplash.com/premium_photo-1661407806034-4eaf2671322f?q=80&w=902&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            },
+            'supermarket2': {
+                name: 'Frescura Express',
+                cuisine: 'Frutas, Verduras Orgánicas',
+                type: 'Supermercado',
+                rating: '4.9 (850+)',
+                deliveryTime: '30-40 min',
+                cover: 'https://images.unsplash.com/photo-1609780447631-05b93e5a88ea?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            },
+            'pharmacy1': {
+                name: 'Farmacia Salud',
+                cuisine: 'Medicamentos, Cuidado Personal',
+                type: 'Farmacia',
+                rating: '4.8 (800+)',
+                deliveryTime: '20-30 min',
+                cover: 'https://plus.unsplash.com/premium_photo-1661766456250-bbde7dd079de?q=80&w=872&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            },
+            'pharmacy2': {
+                name: 'Botica Bienestar',
+                cuisine: 'Vitaminas, Suplementos',
+                type: 'Farmacia',
+                rating: '4.7 (500+)',
+                deliveryTime: '25-35 min',
+                cover: 'https://images.unsplash.com/photo-1631549916768-4119b2e5f926?q=80&w=879&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            },
+            'store1': {
+                name: 'TechGadget',
+                cuisine: 'Electrónica, Accesorios, Hogar Inteligente',
+                type: 'Tienda',
+                rating: '4.5 (300+)',
+                deliveryTime: '30-40 min',
+                cover: 'https://images.unsplash.com/photo-1563770660941-20978e870e26?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            },
+            'store2': {
+                name: 'Librería El Saber',
+                cuisine: 'Libros, Papelería, Revistas',
+                type: 'Tienda',
+                rating: '4.7 (150+)',
+                deliveryTime: '35-50 min',
+                cover: 'https://images.unsplash.com/photo-1525358180237-7399f908a1d9?q=80&w=878&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                menu: []
+            }
+        };
+
+        const categories = [
+            { name: 'Restaurantes', icon: 'fas fa-utensils', type: 'Comida' },
+            { name: 'Supermercados', icon: 'fas fa-shopping-basket', type: 'Supermercado' },
+            { name: 'Farmacias', icon: 'fas fa-pills', type: 'Farmacia' },
+            { name: 'Cafeterías', icon: 'fas fa-coffee', type: 'Cafetería' },
+            { name: 'Tiendas', icon: 'fas fa-box', type: 'Tienda' },
+            { name: 'Más', icon: 'fas fa-ellipsis-h', type: 'all' } // 'all' for general list
+        ];
+
+        let currentCart = [];
+        let currentProduct = null;
+        let currentProductQuantity = 1;
+        let lastCategoryFilter = 'all';
+
+        // Function to show a specific screen and hide others
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+
+            // Update active state in bottom nav
+            const navButtons = document.querySelectorAll('.navbar button');
+            navButtons.forEach(button => button.classList.remove('text-[var(--primary-purple)]', 'active-nav'));
+            navButtons.forEach(button => {
+                const iconClass = button.querySelector('i').classList[1];
+                if ((screenId === 'homeScreen' && iconClass === 'fa-home') ||
+                    (screenId === 'ordersScreen' && iconClass === 'fa-receipt') ||
+                    (screenId === 'cartScreen' && iconClass === 'fa-shopping-cart') ||
+                    (screenId === 'profileScreen' && iconClass === 'fa-user')) {
+                    button.classList.add('text-[var(--primary-purple)]', 'active-nav');
+                } else {
+                    button.classList.add('text-gray-400', 'hover:text-[var(--light-purple)]');
+                }
+            });
+
+            if (screenId === 'cartScreen') {
+                renderCart();
+            } else if (screenId === 'checkoutScreen') {
+                renderCheckoutSummary();
+            }
+        }
+
+        /**
+         * Renders the list of businesses (restaurants, supermarkets, etc.) in the provided container.
+         * @param {HTMLElement} container - The DOM element to render businesses into.
+         * @param {Array} businessesToRender - Array of business objects to display.
+         */
+        function renderBusinesses(container, businessesToRender) {
+            container.innerHTML = ''; // Clear previous content
+
+            if (businessesToRender.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-500 text-lg mt-8">No hay resultados disponibles en este momento.</p>';
+                return;
+            }
+
+            businessesToRender.forEach(business => {
+                const businessId = Object.keys(restaurantsData).find(key => restaurantsData[key] === business);
+                const businessCardHtml = `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition" onclick="showRestaurantDetails('${businessId}')">
+                        <img src="${business.cover}" alt="${business.name}" onerror="this.onerror=null;this.src='https://placehold.co/400x180/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-40 object-cover">
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg text-[var(--text-dark)]">${business.name}</h3>
+                            <p class="text-sm text-gray-500">${business.cuisine}</p>
+                            <div class="flex items-center text-sm text-gray-600 mt-2">
+                                <i class="fas fa-star text-yellow-400 mr-1"></i> ${business.rating}
+                                <span class="mx-2">•</span> <i class="fas fa-motorcycle text-[var(--primary-purple)] mr-1"></i> ${business.deliveryTime}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += businessCardHtml;
+            });
+        }
+
+        /**
+         * Loads and displays a list of businesses based on the specified category filter.
+         * Updates the screen title and populates the business list.
+         * @param {string} filterType - The category type to filter by ('all', 'Comida', 'Cafetería', 'Supermercado', 'Farmacia', 'Tienda').
+         */
+        function loadCategory(filterType) {
+            lastCategoryFilter = filterType;
+
+            let filteredBusinesses = Object.values(restaurantsData);
+            let screenTitle = "Todos los Negocios";
+            let noResultsMessage = "No hay resultados para esta categoría.";
+
+            switch (filterType) {
+                case 'Comida':
+                    filteredBusinesses = filteredBusinesses.filter(b => ['Italiana', 'Japonesa', 'Mexicana', 'Americana', 'Saludable'].includes(b.type));
+                    screenTitle = "Restaurantes de Comida";
+                    noResultsMessage = "No hay restaurantes de comida disponibles en este momento.";
+                    break;
+                case 'Cafetería':
+                    filteredBusinesses = filteredBusinesses.filter(b => b.type === 'Cafetería');
+                    screenTitle = "Cafeterías";
+                    noResultsMessage = "No hay cafeterías disponibles en este momento.";
+                    break;
+                case 'Supermercado':
+                    filteredBusinesses = filteredBusinesses.filter(b => b.type === 'Supermercado');
+                    screenTitle = "Supermercados";
+                    noResultsMessage = "¡Pronto! No hay supermercados disponibles en este momento.";
+                    break;
+                case 'Farmacia':
+                    filteredBusinesses = filteredBusinesses.filter(b => b.type === 'Farmacia');
+                    screenTitle = "Farmacias";
+                    noResultsMessage = "¡Pronto! No hay farmacias disponibles en este momento.";
+                    break;
+                case 'Tienda':
+                    filteredBusinesses = filteredBusinesses.filter(b => b.type === 'Tienda');
+                    screenTitle = "Tiendas Varias";
+                    noResultsMessage = "¡Pronto! No hay tiendas disponibles en este momento.";
+                    break;
+                case 'all': // Default for 'Más' category or search bar focus
+                default:
+                    filteredBusinesses = filteredBusinesses.filter(b => b.type); // Show all known types
+                    screenTitle = "Todos los Negocios";
+                    noResultsMessage = "No hay negocios disponibles en este momento.";
+                    break;
+            }
+
+            const allBusinessesListContainer = document.getElementById('allBusinessesList');
+            document.getElementById('restaurantListScreen').querySelector('h2').innerText = screenTitle;
+            renderBusinesses(allBusinessesListContainer, filteredBusinesses); // Use the new render function
+            showScreen('restaurantListScreen');
+        }
+
+        // Function to populate restaurant details and show its screen
+        function showRestaurantDetails(restaurantId) {
+            const restaurant = restaurantsData[restaurantId];
+            if (!restaurant) {
+                console.error('Restaurant not found:', restaurantId);
+                return;
+            }
+
+            document.getElementById('restaurantCover').src = restaurant.cover;
+            document.getElementById('restaurantName').innerText = restaurant.name;
+            document.getElementById('restaurantCuisine').innerText = restaurant.cuisine;
+            document.getElementById('restaurantRating').innerText = restaurant.rating;
+            document.getElementById('restaurantDeliveryTime').innerText = restaurant.deliveryTime;
+
+            const menuContainer = document.getElementById('restaurantMenu');
+            menuContainer.innerHTML = '';
+
+            if (restaurant.menu && restaurant.menu.length > 0) {
+                restaurant.menu.forEach(item => {
+                    const menuItemHtml = `
+                        <div class="flex items-center bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" onclick="showProductDetails('${restaurantId}', '${item.id}')">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-20 h-20 object-cover rounded-md mr-4">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold text-md text-[var(--text-dark)]">${item.name}</h4>
+                                <p class="text-sm text-gray-500 line-clamp-2">${item.description}</p>
+                                <p class="font-bold text-[var(--primary-purple)] mt-1">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <button class="bg-[var(--accent-green)] text-white p-2 rounded-full text-sm ml-2 self-start"><i class="fas fa-plus"></i></button>
+                        </div>
+                    `;
+                    menuContainer.innerHTML += menuItemHtml;
+                });
+            } else {
+                menuContainer.innerHTML = '<p class="text-center text-gray-500 text-lg mt-8">Este negocio no tiene un menú para mostrar.</p>';
+            }
+
+            showScreen('restaurantDetailsScreen');
+        }
+
+        // Function to show product details and allow adding to cart
+        function showProductDetails(restaurantId, productId) {
+            const restaurant = restaurantsData[restaurantId];
+            if (!restaurant) {
+                console.error('Restaurant not found:', restaurantId);
+                return;
+            }
+            const product = restaurant.menu.find(item => item.id === productId);
+            if (!product) {
+                console.error('Product not found:', productId);
+                return;
+            }
+
+            currentProduct = { ...product, restaurantName: restaurant.name };
+            currentProductQuantity = 1;
+
+            document.getElementById('productImage').src = product.image;
+            document.getElementById('productName').innerText = product.name;
+            document.getElementById('productDescription').innerText = product.description;
+            document.getElementById('productPrice').innerText = product.price.toFixed(2);
+            document.getElementById('productQuantity').innerText = currentProductQuantity;
+            document.getElementById('totalProductPrice').innerText = (product.price * currentProductQuantity).toFixed(2);
+
+            showScreen('productDetailsScreen');
+        }
+
+        // Update quantity in product details screen
+        function updateQuantity(change) {
+            currentProductQuantity += change;
+            if (currentProductQuantity < 1) {
+                currentProductQuantity = 1;
+            }
+            document.getElementById('productQuantity').innerText = currentProductQuantity;
+            document.getElementById('totalProductPrice').innerText = (currentProduct.price * currentProductQuantity).toFixed(2);
+        }
+
+        // Add the currently viewed product to cart
+        function addToCartFromProduct() {
+            if (currentProduct) {
+                const existingItem = currentCart.find(item => item.id === currentProduct.id);
+                if (existingItem) {
+                    existingItem.quantity += currentProductQuantity;
+                } else {
+                    currentCart.push({ ...currentProduct, quantity: currentProductQuantity });
+                }
+                updateCartCount();
+                showModal(`"${currentProduct.name}" (${currentProductQuantity} unidad${currentProductQuantity > 1 ? 'es' : ''}) agregado al carrito.`);
+                showScreen('restaurantDetailsScreen');
+            }
+        }
+
+        // Render items in the cart screen
+        function renderCart() {
+            const cartItemsContainer = document.getElementById('cartItems');
+            cartItemsContainer.innerHTML = '';
+            let subtotal = 0;
+
+            if (currentCart.length === 0) {
+                document.getElementById('emptyCartMessage').classList.remove('hidden');
+            } else {
+                document.getElementById('emptyCartMessage').classList.add('hidden');
+                currentCart.forEach(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                    const cartItemHtml = `
+                        <div class="flex items-center bg-white p-3 rounded-xl shadow-sm">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-16 h-16 object-cover rounded-md mr-4">
+                            <div class="flex-grow">
+                                <h4 class="font-semibold text-md text-[var(--text-dark)]">${item.name}</h4>
+                                <p class="text-sm text-gray-500">${item.restaurantName}</p>
+                                <p class="font-bold text-[var(--primary-purple)] mt-1">$${item.price.toFixed(2)}</p>
+                            </div>
+                            <div class="flex items-center space-x-2 quantity-control">
+                                <button onclick="updateCartItemQuantity('${item.id}', -1)" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"><i class="fas fa-minus"></i></button>
+                                <span class="font-bold text-[var(--text-dark)]">${item.quantity}</span>
+                                <button onclick="updateCartItemQuantity('${item.id}', 1)" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"><i class="fas fa-plus"></i></button>
+                                <button onclick="removeCartItem('${item.id}')" class="text-red-500 ml-2 text-xl"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    `;
+                    cartItemsContainer.innerHTML += cartItemHtml;
+                });
+            }
+
+            const deliveryCost = 3.50;
+            const total = subtotal + deliveryCost;
+
+            document.getElementById('cartSubtotal').innerText = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cartTotal').innerText = `$${total.toFixed(2)}`;
+        }
+
+        // Update quantity of an item directly in the cart
+        function updateCartItemQuantity(productId, change) {
+            const itemIndex = currentCart.findIndex(item => item.id === productId);
+            if (itemIndex > -1) {
+                currentCart[itemIndex].quantity += change;
+                if (currentCart[itemIndex].quantity <= 0) {
+                    currentCart.splice(itemIndex, 1);
+                }
+                renderCart();
+                updateCartCount();
+            }
+        }
+
+        // Remove an item from the cart
+        function removeCartItem(productId) {
+            currentCart = currentCart.filter(item => item.id !== productId);
+            renderCart();
+            updateCartCount();
+        }
+
+        // Update the cart item count displayed in the navbar
+        function updateCartCount() {
+            const itemCount = currentCart.reduce((sum, item) => sum + item.quantity, 0);
+            const cartItemCountSpan = document.getElementById('cartItemCount');
+            if (itemCount > 0) {
+                cartItemCountSpan.innerText = itemCount;
+                cartItemCountSpan.classList.remove('hidden');
+            } else {
+                cartItemCountSpan.classList.add('hidden');
+            }
+        }
+
+        // Render checkout summary
+        function renderCheckoutSummary() {
+            const checkoutSummaryContainer = document.getElementById('checkoutSummary');
+            checkoutSummaryContainer.innerHTML = '';
+            let subtotal = 0;
+
+            if (currentCart.length === 0) {
+                checkoutSummaryContainer.innerHTML = '<p class="text-center text-gray-500">Tu carrito está vacío.</p>';
+                document.getElementById('checkoutTotal').innerText = '$0.00';
+                return;
+            }
+
+            currentCart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                const summaryItemHtml = `
+                    <div class="flex justify-between items-center text-sm text-gray-700">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>$${itemTotal.toFixed(2)}</span>
+                    </div>
+                `;
+                checkoutSummaryContainer.innerHTML += summaryItemHtml;
+            });
+
+            const deliveryCost = 3.50;
+            const total = subtotal + deliveryCost;
+
+            const subtotalLine = `
+                <div class="flex justify-between items-center text-md font-semibold text-[var(--text-dark)] mt-2 border-t border-gray-100 pt-2">
+                    <span>Subtotal:</span>
+                    <span>$${subtotal.toFixed(2)}</span>
+                </div>
+            `;
+            const deliveryLine = `
+                <div class="flex justify-between items-center text-md font-semibold text-[var(--text-dark)]">
+                    <span>Envío:</span>
+                    <span>$${deliveryCost.toFixed(2)}</span>
+                </div>
+            `;
+            checkoutSummaryContainer.innerHTML += subtotalLine + deliveryLine;
+            document.getElementById('checkoutTotal').innerText = `$${total.toFixed(2)}`;
+        }
+
+        // Simulate placing an order
+        function placeOrder() {
+            if (currentCart.length === 0) {
+                showModal("No puedes realizar un pedido con el carrito vacío.");
+                return;
+            }
+            showModal("¡Tu pedido ha sido realizado con éxito!");
+            currentCart = [];
+            updateCartCount();
+            setTimeout(() => showScreen('ordersScreen'), 1500);
+        }
+
+        // --- Modal functions ---
+        function showModal(message) {
+            document.getElementById('modalMessage').innerText = message;
+            document.getElementById('confirmationModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // --- Initial Render Functions ---
+
+        /**
+         * Renders the category cards on the home screen dynamically.
+         */
+        function renderCategories() {
+            const categoryGrid = document.getElementById('categoryGrid');
+            categoryGrid.innerHTML = ''; // Clear existing content
+
+            categories.forEach(category => {
+                const categoryCardHtml = `
+                    <div class="category-card flex flex-col items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" data-category-type="${category.type}">
+                        <div class="w-14 h-14 bg-[var(--bg-light-purple)] rounded-full flex items-center justify-center mb-2">
+                            <i class="${category.icon} text-xl text-[var(--primary-purple)]"></i>
+                        </div>
+                        <span class="text-sm font-medium text-[var(--gray-text)]">${category.name}</span>
+                    </div>
+                `;
+                categoryGrid.innerHTML += categoryCardHtml;
+            });
+
+            // Add event listener to the parent grid for delegation
+            categoryGrid.addEventListener('click', (event) => {
+                const clickedCard = event.target.closest('.category-card');
+                if (clickedCard) {
+                    const categoryType = clickedCard.dataset.categoryType;
+                    loadCategory(categoryType);
+                }
+            });
+        }
+
+        /**
+         * Renders a selection of featured restaurants on the home screen.
+         */
+        function renderFeaturedRestaurants() {
+            const featuredListContainer = document.getElementById('featuredRestaurantsList');
+            featuredListContainer.innerHTML = '';
+
+            const allRestaurants = Object.values(restaurantsData).filter(b => b.type && ['Italiana', 'Japonesa', 'Mexicana', 'Americana', 'Saludable'].includes(b.type));
+            // Shuffle and pick top 3 for featured
+            const shuffledRestaurants = allRestaurants.sort(() => 0.5 - Math.random());
+            const featured = shuffledRestaurants.slice(0, 3);
+
+            renderBusinesses(featuredListContainer, featured);
+        }
+
+        // Initial setup on load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCategories(); // Render categories dynamically
+            renderFeaturedRestaurants(); // Render featured restaurants
+            showScreen('homeScreen'); // Ensure home screen is active on load
+            updateCartCount(); // Initialize cart count
+
+            showModal("¡Bienvenido a Delifast! 😊");
+        });
+
+    </script>
+</body>
+</html>
