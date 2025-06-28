@@ -107,27 +107,32 @@
         /* Custom scrollbar for webkit browsers */
         .main-content::-webkit-scrollbar,
         .screen::-webkit-scrollbar,
-        .sidebar::-webkit-scrollbar {
-            width: 8px;
+        .sidebar::-webkit-scrollbar,
+        .horizontal-scroll-container::-webkit-scrollbar { /* Add for horizontal containers */
+            height: 8px; /* Height for horizontal scrollbar */
+            width: 8px; /* Width for vertical scrollbar */
         }
 
         .main-content::-webkit-scrollbar-track,
         .screen::-webkit-scrollbar-track,
-        .sidebar::-webkit-scrollbar-track {
+        .sidebar::-webkit-scrollbar-track,
+        .horizontal-scroll-container::-webkit-scrollbar-track {
             background: var(--bg-light-purple);
             border-radius: 10px;
         }
 
         .main-content::-webkit-scrollbar-thumb,
         .screen::-webkit-scrollbar-thumb,
-        .sidebar::-webkit-scrollbar-thumb {
+        .sidebar::-webkit-scrollbar-thumb,
+        .horizontal-scroll-container::-webkit-scrollbar-thumb {
             background: var(--light-purple);
             border-radius: 10px;
         }
 
         .main-content::-webkit-scrollbar-thumb:hover,
         .screen::-webkit-scrollbar-thumb:hover,
-        .sidebar::-webkit-scrollbar-thumb:hover {
+        .sidebar::-webkit-scrollbar-thumb:hover,
+        .horizontal-scroll-container::-webkit-scrollbar-thumb:hover {
             background: var(--primary-purple);
         }
 
@@ -225,6 +230,18 @@
         .primary-button {
             @apply text-lg py-3; /* Reduced padding for primary buttons */
         }
+
+        /* Specific styles for horizontal menus */
+        .category-card {
+            flex: 0 0 auto; /* Do not grow or shrink, base on content */
+            width: 120px; /* Fixed width for category cards in horizontal scroll */
+        }
+
+        .menu-item-card {
+            flex: 0 0 auto; /* Do not grow or shrink, base on content */
+            min-width: 250px; /* Minimum width for menu items in horizontal scroll */
+            max-width: 300px; /* Max width to prevent too wide items */
+        }
     </style>
 </head>
 <body>
@@ -278,15 +295,15 @@
                     </div>
                     <div class="relative">
                         <!-- Search input: Calls loadCategory('all') to show all businesses when focused -->
-                        <input type="text" placeholder="¿Qué se te antoja hoy?" class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200">
+                        <input type="text" placeholder="¿Qué se te antoja hoy?" class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200" onfocus="loadCategory('all')">
                         <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     </div>
                 </div>
 
                 <div class="flex-grow p-6 pt-0 overflow-y-auto">
-                    <!-- Categories -->
+                    <!-- Categories (Horizontal Scroll) -->
                     <h2 class="text-2xl font-bold text-[var(--text-dark)] my-4">Categorías</h2>
-                    <div id="categoryGrid" class="grid grid-cols-4 gap-3 mb-8"> <!-- Adjusted gap -->
+                    <div id="categoryGrid" class="flex space-x-4 overflow-x-auto pb-4 horizontal-scroll-container">
                         <!-- Category cards will be dynamically generated here -->
                     </div>
 
@@ -331,7 +348,8 @@
                 </div>
                 <div class="flex-grow p-6 pt-0 overflow-y-auto">
                     <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Menú</h3>
-                    <div id="restaurantMenu" class="grid grid-cols-2 gap-4">
+                    <!-- Menu items (Horizontal Scroll on larger screens) -->
+                    <div id="restaurantMenu" class="flex flex-col space-y-4 md:flex-row md:space-x-4 md:space-y-0 overflow-x-auto pb-4 horizontal-scroll-container">
                         <!-- Menu items will be loaded here dynamically -->
                     </div>
                 </div>
@@ -809,14 +827,12 @@
             if (restaurant.menu && restaurant.menu.length > 0) {
                 restaurant.menu.forEach(item => {
                     const menuItemHtml = `
-                        <div class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" onclick="showProductDetails('${restaurantId}', '${item.id}')">
-                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-24 h-24 object-cover rounded-md mr-4">
-                            <div class="flex-grow">
-                                <h4 class="font-semibold text-lg text-[var(--text-dark)]">${item.name}</h4>
-                                <p class="text-md text-gray-500 line-clamp-2">${item.description}</p>
-                                <p class="font-bold text-[var(--primary-purple)] mt-1 text-lg">$${item.price.toFixed(2)}</p>
-                            </div>
-                            <button class="bg-[var(--accent-green)] text-white p-3 rounded-full text-lg ml-2 self-start"><i class="fas fa-plus"></i></button>
+                        <div class="menu-item-card bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer flex flex-col items-start" onclick="showProductDetails('${restaurantId}', '${item.id}')">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-32 object-cover rounded-md mb-4">
+                            <h4 class="font-semibold text-lg text-[var(--text-dark)]">${item.name}</h4>
+                            <p class="text-sm text-gray-500 line-clamp-2 mb-2">${item.description}</p>
+                            <p class="font-bold text-[var(--primary-purple)] mt-auto text-lg">$${item.price.toFixed(2)}</p>
+                            <button class="bg-[var(--accent-green)] text-white p-2 rounded-full text-base self-end"><i class="fas fa-plus"></i></button>
                         </div>
                     `;
                     menuContainer.innerHTML += menuItemHtml;
@@ -849,7 +865,7 @@
             document.getElementById('productDescription').innerText = product.description;
             document.getElementById('productPrice').innerText = product.price.toFixed(2);
             document.getElementById('productQuantity').innerText = currentProductQuantity;
-            document.getElementById('totalProductPrice').innerText = (currentProduct.price * currentProductQuantity).toFixed(2);
+            document.getElementById('totalProductPrice').innerText = (product.price * currentProductQuantity).toFixed(2);
 
             showScreen('productDetailsScreen');
         }
@@ -1041,7 +1057,7 @@
             categoryGrid.addEventListener('click', (event) => {
                 const clickedCard = event.target.closest('.category-card');
                 if (clickedCard) {
-                    const categoryType = clickedCard.dataset.category-type;
+                    const categoryType = clickedCard.dataset.categoryType;
                     loadCategory(categoryType);
                 }
             });
