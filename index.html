@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Delifast - Tu Delivery Rápido</title>
+    <title>Delifast - Tu Delivery Rápido (PC Responsive)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -29,43 +29,64 @@
             padding: 0;
             overflow-x: hidden; /* Prevent horizontal scroll */
             display: flex;
-            justify-content: center;
+            justify-content: flex-start; /* Align to start for full width */
             align-items: flex-start;
             min-height: 100vh;
+            width: 100%; /* Ensure body takes full width */
         }
 
-        /* Main app container on larger screens */
+        /* Main app container for desktop layout - now truly edge-to-edge */
         .app-container {
-            width: 100%;
-            max-width: 450px; /* Typical mobile width */
+            width: 100%; /* Take full width on larger screens */
+            max-width: none; /* Remove max-width constraint for full responsiveness */
             background-color: #fff;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Keep shadow for depth */
+            border-radius: 0; /* No border-radius for edge-to-edge design */
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Full height on mobile */
+            display: grid; /* Use grid for desktop layout */
+            grid-template-columns: 250px 1fr; /* Sidebar fixed width, main content takes rest */
+            min-height: 100vh; /* Full height of viewport */
             position: relative;
         }
 
-        /* Responsive adjustments */
-        @media (min-width: 768px) {
-            body {
-                align-items: center; /* Center app vertically on larger screens */
-            }
+        /* Responsive adjustments for app-container: Optional border-radius for slightly smaller desktop views */
+        @media (min-width: 768px) and (max-width: 1400px) { /* Example range for a slightly "boxed" look */
             .app-container {
-                min-height: 800px; /* Fixed height for desktop preview */
-                height: 90vh; /* Max height on desktop */
+                border-radius: 20px; /* Re-apply border-radius for tablet/mid-desktop sizes */
+                max-width: 1200px; /* Max-width for mid-sized screens to keep content centered */
+                margin: 0 auto; /* Center the container when max-width is active */
             }
+        }
+
+
+        /* Sidebar styling */
+        .sidebar {
+            background-color: #fff;
+            padding: 1.5rem;
+            border-right: 1px solid var(--bg-light-purple);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .main-content {
+            flex-grow: 1; /* Allow main content to take available space */
+            overflow-y: auto; /* Enable scrolling for main content */
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Ensure it fills the app-container height */
         }
 
         /* Hide screens by default, show active one */
         .screen {
             display: none;
-            flex-grow: 1; /* Allow screen content to take available space */
-            overflow-y: auto; /* Enable scrolling for screen content */
-            padding-bottom: 70px; /* Space for fixed bottom nav */
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-bottom: 2rem;
+            -webkit-overflow-scrolling: touch;
         }
 
         .screen.active {
@@ -73,52 +94,46 @@
             flex-direction: column;
         }
 
-        /* Sticky header and fixed footer */
+        /* Sticky header */
         .header {
             position: sticky;
             top: 0;
             z-index: 10;
-            background-color: #fff; /* Ensure header content is visible */
-            padding-bottom: 0.5rem; /* Small padding at bottom of header */
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
-        }
-
-        .navbar {
-            position: fixed; /* Changed from sticky to fixed */
-            bottom: 0;
-            left: 50%; /* Center the navbar */
-            transform: translateX(-50%); /* Center the navbar */
-            width: 100%;
-            max-width: 450px; /* Match app-container max-width */
             background-color: #fff;
-            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
-            z-index: 20;
-            border-top-left-radius: 20px; /* Rounded corners for fixed nav */
-            border-top-right-radius: 20px; /* Rounded corners for fixed nav */
+            padding-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
         /* Custom scrollbar for webkit browsers */
-        .screen::-webkit-scrollbar {
+        .main-content::-webkit-scrollbar,
+        .screen::-webkit-scrollbar,
+        .sidebar::-webkit-scrollbar {
             width: 8px;
         }
 
-        .screen::-webkit-scrollbar-track {
+        .main-content::-webkit-scrollbar-track,
+        .screen::-webkit-scrollbar-track,
+        .sidebar::-webkit-scrollbar-track {
             background: var(--bg-light-purple);
             border-radius: 10px;
         }
 
-        .screen::-webkit-scrollbar-thumb {
+        .main-content::-webkit-scrollbar-thumb,
+        .screen::-webkit-scrollbar-thumb,
+        .sidebar::-webkit-scrollbar-thumb {
             background: var(--light-purple);
             border-radius: 10px;
         }
 
-        .screen::-webkit-scrollbar-thumb:hover {
+        .main-content::-webkit-scrollbar-thumb:hover,
+        .screen::-webkit-scrollbar-thumb:hover,
+        .sidebar::-webkit-scrollbar-thumb:hover {
             background: var(--primary-purple);
         }
 
-        /* Styling for the quantity controls */
+        /* Styling for the quantity controls - Smaller buttons */
         .quantity-control button {
-            @apply bg-gray-200 text-gray-700 px-3 py-1 rounded-full font-bold text-lg;
+            @apply bg-gray-200 text-gray-700 px-2 py-1 rounded-full font-bold text-base; /* Smaller padding and font */
             transition: background-color 0.2s;
         }
         .quantity-control button:hover {
@@ -135,19 +150,18 @@
 
         /* Modal styling */
         .modal {
-    display: none; /* Asegura que no se muestre por defecto */
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.4);
-    align-items: center;
-    justify-content: center;
-}
-
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            align-items: center;
+            justify-content: center;
+        }
 
         .modal-content {
             background-color: #fefefe;
@@ -177,6 +191,40 @@
         #delifastLogo {
             filter: invert(19%) sepia(91%) saturate(1917%) hue-rotate(253deg) brightness(85%) contrast(87%);
         }
+
+        /* Adjustments for general text sizes on desktop */
+        .header h1 {
+            font-size: 2.5rem; /* Larger title for desktop */
+        }
+        .header h2 {
+            font-size: 2rem;
+        }
+        .text-3xl {
+            font-size: 2.25rem;
+        }
+        .text-2xl {
+            font-size: 1.5rem;
+        }
+        .text-xl {
+            font-size: 1.25rem;
+        }
+        .text-lg {
+            font-size: 1.125rem;
+        }
+        .text-md {
+            font-size: 1rem;
+        }
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        .text-xs {
+            font-size: 0.75rem;
+        }
+
+        /* Primary action buttons - Smaller on desktop */
+        .primary-button {
+            @apply text-lg py-3; /* Reduced padding for primary buttons */
+        }
     </style>
 </head>
 <body>
@@ -187,291 +235,294 @@
             <div class="modal-content">
                 <span class="close-button" onclick="closeModal('confirmationModal')">&times;</span>
                 <p id="modalMessage" class="text-xl font-semibold mb-4"></p>
-                <button class="bg-[var(--primary-purple)] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[var(--light-purple)]" onclick="closeModal('confirmationModal')">Aceptar</button>
+                <button class="bg-[var(--primary-purple)] text-white px-6 py-3 rounded-full shadow-lg hover:bg-[var(--light-purple)] primary-button" onclick="closeModal('confirmationModal')">Aceptar</button>
             </div>
         </div>
 
-        <!-- Home Screen -->
-        <section id="homeScreen" class="screen active">
-            <div class="header p-4 pb-2">
-                <div class="flex justify-between items-center mb-4">
-                    <!-- Delifast Logo -->
-                    <img id="delifastLogo" src="delifast.png" alt="Delifast Logo" class="h-8">
-                    <div class="relative">
-                        <!-- Delivery Man Avatar -->
-                        <img src="https://placehold.co/40x40/6F2DBD/FFFFFF?text=DM" alt="Delivery Man Avatar" class="w-10 h-10 rounded-full border-2 border-[var(--primary-purple)]">
-                        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
-                    </div>
-                </div>
-                <div class="relative">
-                    <!-- Search input: Calls loadCategory('all') to show all businesses when focused -->
-                    <input type="text" placeholder="¿Qué se te antoja hoy?" class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200" onfocus="loadCategory('all')">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                </div>
+        <!-- Sidebar Navigation (replacing bottom navbar) -->
+        <nav class="sidebar">
+            <div class="mb-8 mt-4">
+                <img id="delifastLogo" src="delifast.png" alt="Delifast Logo" class="h-10">
             </div>
-
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <!-- Categories -->
-                <h2 class="text-xl font-bold text-[var(--text-dark)] my-4">Categorías</h2>
-                <div id="categoryGrid" class="grid grid-cols-3 gap-3 mb-6">
-                    <!-- Category cards will be dynamically generated here -->
-                </div>
-
-                <!-- Featured Restaurants -->
-                <h2 class="text-xl font-bold text-[var(--text-dark)] mb-4">Restaurantes Destacados</h2>
-                <div id="featuredRestaurantsList" class="space-y-4">
-                    <!-- Featured restaurant cards will be dynamically generated here -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Restaurant List Screen (for search/category results) -->
-        <section id="restaurantListScreen" class="screen">
-            <div class="header p-4 pb-2 flex items-center">
-                <!-- Back button for restaurant list screen: goes back to home -->
-                <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('homeScreen')"><i class="fas fa-arrow-left"></i></button>
-                <input type="text" placeholder="Buscar negocios..." class="flex-grow pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200">
-                <i class="fas fa-search absolute left-14 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <!-- Title will be updated dynamically by loadCategory function -->
-                <h2 class="text-2xl font-bold text-[var(--text-dark)] mb-4"></h2>
-                <div id="allBusinessesList" class="space-y-4">
-                    <!-- All business cards will be loaded here dynamically by loadCategory -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Restaurant Details Screen -->
-        <section id="restaurantDetailsScreen" class="screen">
-            <div class="header p-4 pb-2">
-                <!-- Back button for restaurant details: goes back to the last category list -->
-                <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="loadCategory(lastCategoryFilter)"><i class="fas fa-arrow-left"></i></button>
-                <!-- Restaurant cover image will be dynamically updated by JS -->
-                <img id="restaurantCover" src="" alt="Restaurant Cover" onerror="this.onerror=null;this.src='https://placehold.co/400x200/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-48 object-cover rounded-xl mb-4 shadow-md">
-                <h2 id="restaurantName" class="text-3xl font-bold text-[var(--text-dark)] mb-2"></h2>
-                <p id="restaurantCuisine" class="text-gray-600 text-md mb-2"></p>
-                <div class="flex items-center text-sm text-gray-600 mb-4">
-                    <i class="fas fa-star text-yellow-400 mr-1"></i> <span id="restaurantRating"></span>
-                    <span class="mx-2">•</span> <i class="fas fa-motorcycle text-[var(--primary-purple)] mr-1"></i> <span id="restaurantDeliveryTime"></span>
-                </div>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Menú</h3>
-                <div id="restaurantMenu" class="space-y-4">
-                    <!-- Menu items will be loaded here dynamically -->
-                </div>
-            </div>
-        </section>
-
-        <!-- Product Details Modal (simulated as a full screen for mobile flow) -->
-        <section id="productDetailsScreen" class="screen">
-            <div class="header p-4 pb-2">
-                <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="showScreen('restaurantDetailsScreen')"><i class="fas fa-arrow-left"></i></button>
-                <!-- Product image will be dynamically updated by JS -->
-                <img id="productImage" src="" alt="Product Image" onerror="this.onerror=null;this.src='https://placehold.co/400x200/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-56 object-cover rounded-xl mb-4 shadow-md">
-                <h2 id="productName" class="text-3xl font-bold text-[var(--text-dark)] mb-2"></h2>
-                <p id="productDescription" class="text-gray-600 text-md mb-4"></p>
-                <p class="text-2xl font-bold text-[var(--primary-purple)] mb-4"><span id="productPrice"></span></p>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <div class="flex items-center justify-center space-x-4 mb-6">
-                    <button class="quantity-control" onclick="updateQuantity(-1)"><i class="fas fa-minus"></i></button>
-                    <span id="productQuantity" class="text-2xl font-bold text-[var(--text-dark)]">1</span>
-                    <button class="quantity-control" onclick="updateQuantity(1)"><i class="fas fa-plus"></i></button>
-                </div>
-                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="addToCartFromProduct()">
-                    Agregar al carrito - $<span id="totalProductPrice"></span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Cart Screen -->
-        <section id="cartScreen" class="screen">
-            <div class="header p-4 pb-2">
-                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Tu Carrito</h2>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <div id="cartItems" class="space-y-4">
-                    <!-- Cart items will be loaded here -->
-                    <p id="emptyCartMessage" class="text-center text-gray-500 text-lg mt-8">Tu carrito está vacío.</p>
-                </div>
-            </div>
-            <div class="p-4 bg-white border-t border-gray-100 sticky bottom-[70px] w-full max-w-[450px]">
-                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)] mb-4">
-                    <span>Subtotal:</span>
-                    <span id="cartSubtotal">$0.00</span>
-                </div>
-                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)] mb-4">
-                    <span>Costo de envío:</span>
-                    <span>$3.50</span>
-                </div>
-                <div class="flex justify-between items-center text-xl font-bold text-[var(--primary-purple)] mb-6">
-                    <span>Total:</span>
-                    <span id="cartTotal">$3.50</span>
-                </div>
-                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="showScreen('checkoutScreen')">
-                    Proceder al Pago
-                </button>
-            </div>
-        </section>
-
-        <!-- Checkout Screen -->
-        <section id="checkoutScreen" class="screen">
-            <div class="header p-4 pb-2 flex items-center">
-                <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('cartScreen')"><i class="fas fa-arrow-left"></i></button>
-                <h2 class="text-3xl font-bold text-[var(--primary-purple)]">Checkout</h2>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Dirección de Entrega</h3>
-                <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
-                    <p class="font-semibold text-[var(--text-dark)]">Mi Casa</p>
-                    <p class="text-gray-600">Av. Siempre Viva 742, Springfield</p>
-                    <button class="text-[var(--light-purple)] mt-2 text-sm">Cambiar</button>
-                </div>
-
-                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Método de Pago</h3>
-                <div class="bg-white p-4 rounded-xl shadow-sm mb-6">
-                    <div class="flex items-center mb-2">
-                        <input type="radio" id="card" name="paymentMethod" value="card" class="form-radio text-[var(--primary-purple)] h-5 w-5" checked>
-                        <label for="card" class="ml-3 text-lg text-[var(--text-dark)]">Tarjeta de Crédito/Débito</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="radio" id="cash" name="paymentMethod" value="cash" class="form-radio text-[var(--primary-purple)] h-5 w-5">
-                        <label for="cash" class="ml-3 text-lg text-[var(--text-dark)]">Efectivo</label>
-                    </div>
-                </div>
-
-                <h3 class="text-xl font-bold text-[var(--text-dark)] mb-4">Resumen del Pedido</h3>
-                <div id="checkoutSummary" class="bg-white p-4 rounded-xl shadow-sm space-y-2 mb-6">
-                    <!-- Summary items will be loaded here -->
-                </div>
-
-                <div class="flex justify-between items-center text-xl font-bold text-[var(--primary-purple)] mb-6">
-                    <span>Total a Pagar:</span>
-                    <span id="checkoutTotal">$0.00</span>
-                </div>
-
-                <button class="w-full bg-[var(--primary-purple)] text-white text-lg py-4 rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="placeOrder()">
-                    Confirmar Pedido
-                </button>
-            </div>
-        </section>
-
-        <!-- Orders Screen -->
-        <section id="ordersScreen" class="screen">
-            <div class="header p-4 pb-2">
-                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Mis Pedidos</h2>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <div id="currentOrders" class="mb-6">
-                    <h3 class="text-xl font-bold text-[var(--text-dark)] mb-3">Pedidos Activos</h3>
-                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
-                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF987654</p>
-                        <p class="text-sm text-gray-600">La Piazza Italiana - En camino</p>
-                        <p class="text-sm text-[var(--primary-purple)] font-bold">$35.00</p>
-                    </div>
-                    <p id="noCurrentOrders" class="text-center text-gray-500 text-lg mt-8 hidden">No tienes pedidos activos.</p>
-                </div>
-
-                <div id="pastOrders">
-                    <h3 class="text-xl font-bold text-[var(--text-dark)] mb-3">Historial de Pedidos</h3>
-                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
-                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF123456</p>
-                        <p class="text-sm text-gray-600">Kyoto Sushi - Entregado</p>
-                        <p class="text-sm text-[var(--primary-purple)] font-bold">$28.50</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-xl shadow-sm mb-4">
-                        <p class="font-semibold text-[var(--text-dark)]">Pedido #DF789012</p>
-                        <p class="text-sm text-gray-600">Green Bites - Entregado</p>
-                        <p class="text-sm text-[var(--primary-purple)] font-bold">$22.00</p>
-                    </div>
-                    <p id="noPastOrders" class="text-center text-gray-500 text-lg mt-8 hidden">No tienes pedidos anteriores.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Profile Screen -->
-        <section id="profileScreen" class="screen">
-            <div class="header p-4 pb-2">
-                <h2 class="text-3xl font-bold text-[var(--primary-purple)] mb-4">Mi Perfil</h2>
-            </div>
-            <div class="flex-grow p-4 pt-0 overflow-y-auto">
-                <div class="flex flex-col items-center mb-6">
-                    <!-- User Avatar -->
-                    <img src="https://placehold.co/100x100/6F2DBD/FFFFFF?text=User" alt="User Avatar" class="w-24 h-24 rounded-full border-4 border-[var(--primary-purple)] mb-3">
-                    <h3 class="text-2xl font-bold text-[var(--text-dark)]">Usuario Delifast</h3>
-                    <p class="text-gray-600">usuario@example.com</p>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
-                    <h4 class="font-semibold text-[var(--text-dark)] mb-3">Información Personal</h4>
-                    <ul class="space-y-2 text-gray-700">
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Nombre:</span>
-                            <span>Juan Pérez</span>
-                        </li>
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Teléfono:</span>
-                            <span>+51 987 654 321</span>
-                        </li>
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Dirección:</span>
-                            <span>Av. Siempre Viva 742</span>
-                        </li>
-                    </ul>
-                    <button class="text-[var(--light-purple)] mt-4 text-sm">Editar Información</button>
-                </div>
-
-                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
-                    <h4 class="font-semibold text-[var(--text-dark)] mb-3">Configuración</h4>
-                    <ul class="space-y-2 text-gray-700">
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Notificaciones</span>
-                            <label class="relative inline-flex items-center cursor-pointer">
-                                <input type="checkbox" value="" class="sr-only peer" checked>
-                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--light-purple)] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--primary-purple)]"></div>
-                            </label>
-                        </li>
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Métodos de Pago</span>
-                            <i class="fas fa-chevron-right text-gray-400"></i>
-                        </li>
-                        <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
-                            <span>Ayuda y Soporte</span>
-                            <i class="fas fa-chevron-right text-gray-400"></i>
-                        </li>
-                    </ul>
-                </div>
-
-                <button class="w-full bg-red-500 text-white text-lg py-3 rounded-full shadow-lg hover:bg-red-600 transition duration-200">
-                    Cerrar Sesión
-                </button>
-            </div>
-        </section>
-
-
-        <!-- Bottom Navigation Bar -->
-        <nav class="navbar flex justify-around items-center py-3 px-2">
-            <button class="flex flex-col items-center text-[var(--primary-purple)] active-nav" onclick="showScreen('homeScreen')">
-                <i class="fas fa-home text-xl mb-1"></i>
-                <span class="text-xs font-medium">Inicio</span>
+            <button class="flex items-center w-full py-3 px-4 rounded-xl mb-3 text-[var(--primary-purple)] bg-[var(--bg-light-purple)] active-nav" onclick="showScreen('homeScreen')">
+                <i class="fas fa-home text-xl mr-3"></i>
+                <span class="text-md font-medium">Inicio</span>
             </button>
-            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)]" onclick="showScreen('ordersScreen')">
-                <i class="fas fa-receipt text-xl mb-1"></i>
-                <span class="text-xs font-medium">Pedidos</span>
+            <button class="flex items-center w-full py-3 px-4 rounded-xl mb-3 text-gray-700 hover:bg-gray-100" onclick="showScreen('ordersScreen')">
+                <i class="fas fa-receipt text-xl mr-3"></i>
+                <span class="text-md font-medium">Pedidos</span>
             </button>
-            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)] relative" onclick="showScreen('cartScreen')">
-                <i class="fas fa-shopping-cart text-xl mb-1"></i>
-                <span class="text-xs font-medium">Carrito</span>
-                <span id="cartItemCount" class="absolute top-0 right-0 -mt-1 -mr-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+            <button class="flex items-center w-full py-3 px-4 rounded-xl mb-3 text-gray-700 hover:bg-gray-100 relative" onclick="showScreen('cartScreen')">
+                <i class="fas fa-shopping-cart text-xl mr-3"></i>
+                <span class="text-md font-medium">Carrito</span>
+                <span id="cartItemCount" class="absolute top-1/2 -translate-y-1/2 right-4 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
             </button>
-            <button class="flex flex-col items-center text-gray-400 hover:text-[var(--light-purple)]" onclick="showScreen('profileScreen')">
-                <i class="fas fa-user text-xl mb-1"></i>
-                <span class="text-xs font-medium">Perfil</span>
+            <button class="flex items-center w-full py-3 px-4 rounded-xl mb-3 text-gray-700 hover:bg-gray-100" onclick="showScreen('profileScreen')">
+                <i class="fas fa-user text-xl mr-3"></i>
+                <span class="text-md font-medium">Perfil</span>
             </button>
         </nav>
 
+        <!-- Main Content Area (where screens will be displayed) -->
+        <div class="main-content">
+            <!-- Home Screen -->
+            <section id="homeScreen" class="screen active">
+                <div class="header p-6 pb-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <!-- Delivery Man Avatar -->
+                        <div class="relative">
+                            <img src="https://placehold.co/40x40/6F2DBD/FFFFFF?text=DM" alt="Delivery Man Avatar" class="w-10 h-10 rounded-full border-2 border-[var(--primary-purple)]">
+                            <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
+                        </div>
+                        <h1 class="text-3xl font-bold text-[var(--primary-purple)]">¡Bienvenido a Delifast!</h1>
+                    </div>
+                    <div class="relative">
+                        <!-- Search input: Calls loadCategory('all') to show all businesses when focused -->
+                        <input type="text" placeholder="¿Qué se te antoja hoy?" class="w-full pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <!-- Categories -->
+                    <h2 class="text-2xl font-bold text-[var(--text-dark)] my-4">Categorías</h2>
+                    <div id="categoryGrid" class="grid grid-cols-4 gap-3 mb-8"> <!-- Adjusted gap -->
+                        <!-- Category cards will be dynamically generated here -->
+                    </div>
+
+                    <!-- Featured Restaurants -->
+                    <h2 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Restaurantes Destacados</h2>
+                    <div id="featuredRestaurantsList" class="grid grid-cols-2 gap-4">
+                        <!-- Featured restaurant cards will be dynamically generated here -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Restaurant List Screen (for search/category results) -->
+            <section id="restaurantListScreen" class="screen">
+                <div class="header p-6 pb-4 flex items-center">
+                    <!-- Back button for restaurant list screen: goes back to home -->
+                    <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('homeScreen')"><i class="fas fa-arrow-left"></i></button>
+                    <input type="text" placeholder="Buscar negocios..." class="flex-grow pl-10 pr-4 py-3 rounded-full bg-gray-100 text-[var(--text-dark)] focus:outline-none focus:ring-2 focus:ring-[var(--light-purple)] transition duration-200">
+                    <i class="fas fa-search absolute left-20 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <!-- Title will be updated dynamically by loadCategory function -->
+                    <h2 class="text-3xl font-bold text-[var(--text-dark)] mb-6"></h2>
+                    <div id="allBusinessesList" class="grid grid-cols-2 gap-4">
+                        <!-- All business cards will be loaded here dynamically by loadCategory -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Restaurant Details Screen -->
+            <section id="restaurantDetailsScreen" class="screen">
+                <div class="header p-6 pb-4">
+                    <!-- Back button for restaurant details: goes back to the last category list -->
+                    <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="loadCategory(lastCategoryFilter)"><i class="fas fa-arrow-left"></i></button>
+                    <!-- Restaurant cover image will be dynamically updated by JS -->
+                    <img id="restaurantCover" src="" alt="Restaurant Cover" onerror="this.onerror=null;this.src='https://placehold.co/800x300/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-64 object-cover rounded-xl mb-6 shadow-md">
+                    <h2 id="restaurantName" class="text-4xl font-bold text-[var(--text-dark)] mb-2"></h2>
+                    <p id="restaurantCuisine" class="text-gray-600 text-lg mb-2"></p>
+                    <div class="flex items-center text-md text-gray-600 mb-4">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i> <span id="restaurantRating"></span>
+                        <span class="mx-2">•</span> <i class="fas fa-motorcycle text-[var(--primary-purple)] mr-1"></i> <span id="restaurantDeliveryTime"></span>
+                    </div>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Menú</h3>
+                    <div id="restaurantMenu" class="grid grid-cols-2 gap-4">
+                        <!-- Menu items will be loaded here dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Product Details Modal (simulated as a full screen for mobile flow) -->
+            <section id="productDetailsScreen" class="screen">
+                <div class="header p-6 pb-4">
+                    <button class="text-[var(--primary-purple)] text-2xl mb-4" onclick="showScreen('restaurantDetailsScreen')"><i class="fas fa-arrow-left"></i></button>
+                    <!-- Product image will be dynamically updated by JS -->
+                    <img id="productImage" src="" alt="Product Image" onerror="this.onerror=null;this.src='https://placehold.co/800x400/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-full h-80 object-cover rounded-xl mb-6 shadow-md">
+                    <h2 id="productName" class="text-4xl font-bold text-[var(--text-dark)] mb-2"></h2>
+                    <p id="productDescription" class="text-gray-600 text-lg mb-4"></p>
+                    <p class="text-3xl font-bold text-[var(--primary-purple)] mb-4"><span id="productPrice"></span></p>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <div class="flex items-center justify-center space-x-4 mb-6">
+                        <button class="quantity-control" onclick="updateQuantity(-1)"><i class="fas fa-minus"></i></button>
+                        <span id="productQuantity" class="text-3xl font-bold text-[var(--text-dark)]">1</span>
+                        <button class="quantity-control" onclick="updateQuantity(1)"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <button class="w-full bg-[var(--primary-purple)] text-white primary-button rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="addToCartFromProduct()">
+                        Agregar al carrito - $<span id="totalProductPrice"></span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Cart Screen -->
+            <section id="cartScreen" class="screen">
+                <div class="header p-6 pb-4">
+                    <h2 class="text-4xl font-bold text-[var(--primary-purple)] mb-6">Tu Carrito</h2>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <div id="cartItems" class="space-y-4">
+                        <!-- Cart items will be loaded here -->
+                        <p id="emptyCartMessage" class="text-center text-gray-500 text-xl mt-12">Tu carrito está vacío.</p>
+                    </div>
+                </div>
+                <div class="p-6 bg-white border-t border-gray-100">
+                    <div class="flex justify-between items-center text-xl font-semibold text-[var(--text-dark)] mb-4">
+                        <span>Subtotal:</span>
+                        <span id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xl font-semibold text-[var(--text-dark)] mb-4">
+                        <span>Costo de envío:</span>
+                        <span>$3.50</span>
+                    </div>
+                    <div class="flex justify-between items-center text-2xl font-bold text-[var(--primary-purple)] mb-6">
+                        <span>Total:</span>
+                        <span id="cartTotal">$3.50</span>
+                    </div>
+                    <button class="w-full bg-[var(--primary-purple)] text-white primary-button rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="showScreen('checkoutScreen')">
+                        Proceder al Pago
+                    </button>
+                </div>
+            </section>
+
+            <!-- Checkout Screen -->
+            <section id="checkoutScreen" class="screen">
+                <div class="header p-6 pb-4 flex items-center">
+                    <button class="text-[var(--primary-purple)] mr-4 text-2xl" onclick="showScreen('cartScreen')"><i class="fas fa-arrow-left"></i></button>
+                    <h2 class="text-4xl font-bold text-[var(--primary-purple)]">Checkout</h2>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Dirección de Entrega</h3>
+                    <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
+                        <p class="font-semibold text-[var(--text-dark)] text-lg">Mi Casa</p>
+                        <p class="text-gray-600 text-md">Av. Siempre Viva 742, Springfield</p>
+                        <button class="text-[var(--light-purple)] mt-3 text-sm">Cambiar</button>
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Método de Pago</h3>
+                    <div class="bg-white p-5 rounded-xl shadow-sm mb-6">
+                        <div class="flex items-center mb-3">
+                            <input type="radio" id="card" name="paymentMethod" value="card" class="form-radio text-[var(--primary-purple)] h-6 w-6" checked>
+                            <label for="card" class="ml-3 text-xl text-[var(--text-dark)]">Tarjeta de Crédito/Débito</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="radio" id="cash" name="paymentMethod" value="cash" class="form-radio text-[var(--primary-purple)] h-6 w-6">
+                            <label for="cash" class="ml-3 text-xl text-[var(--text-dark)]">Efectivo</label>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Resumen del Pedido</h3>
+                    <div id="checkoutSummary" class="bg-white p-5 rounded-xl shadow-sm space-y-3 mb-6">
+                        <!-- Summary items will be loaded here -->
+                    </div>
+
+                    <div class="flex justify-between items-center text-2xl font-bold text-[var(--primary-purple)] mb-6">
+                        <span>Total a Pagar:</span>
+                        <span id="checkoutTotal">$0.00</span>
+                    </div>
+
+                    <button class="w-full bg-[var(--primary-purple)] text-white primary-button rounded-full shadow-lg hover:bg-[var(--light-purple)] transition duration-200" onclick="placeOrder()">
+                        Confirmar Pedido
+                    </button>
+                </div>
+            </section>
+
+            <!-- Orders Screen -->
+            <section id="ordersScreen" class="screen">
+                <div class="header p-6 pb-4">
+                    <h2 class="text-4xl font-bold text-[var(--primary-purple)] mb-6">Mis Pedidos</h2>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <div id="currentOrders" class="mb-8">
+                        <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Pedidos Activos</h3>
+                        <div class="bg-white p-5 rounded-xl shadow-sm mb-4">
+                            <p class="font-semibold text-[var(--text-dark)] text-lg">Pedido #DF987654</p>
+                            <p class="text-md text-gray-600">La Piazza Italiana - En camino</p>
+                            <p class="text-md text-[var(--primary-purple)] font-bold">$35.00</p>
+                        </div>
+                        <p id="noCurrentOrders" class="text-center text-gray-500 text-xl mt-8 hidden">No tienes pedidos activos.</p>
+                    </div>
+
+                    <div id="pastOrders">
+                        <h3 class="text-2xl font-bold text-[var(--text-dark)] mb-4">Historial de Pedidos</h3>
+                        <div class="bg-white p-5 rounded-xl shadow-sm mb-4">
+                            <p class="font-semibold text-[var(--text-dark)] text-lg">Pedido #DF123456</p>
+                            <p class="text-md text-gray-600">Kyoto Sushi - Entregado</p>
+                            <p class="text-md text-[var(--primary-purple)] font-bold">$28.50</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl shadow-sm mb-4">
+                            <p class="font-semibold text-[var(--text-dark)] text-lg">Pedido #DF789012</p>
+                            <p class="text-md text-gray-600">Green Bites - Entregado</p>
+                            <p class="text-md text-[var(--primary-purple)] font-bold">$22.00</p>
+                        </div>
+                        <p id="noPastOrders" class="text-center text-gray-500 text-xl mt-8 hidden">No tienes pedidos anteriores.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Screen -->
+            <section id="profileScreen" class="screen">
+                <div class="header p-6 pb-4">
+                    <h2 class="text-4xl font-bold text-[var(--primary-purple)] mb-6">Mi Perfil</h2>
+                </div>
+                <div class="flex-grow p-6 pt-0 overflow-y-auto">
+                    <div class="flex flex-col items-center mb-8">
+                        <!-- User Avatar -->
+                        <img src="https://placehold.co/120x120/6F2DBD/FFFFFF?text=User" alt="User Avatar" class="w-32 h-32 rounded-full border-4 border-[var(--primary-purple)] mb-4">
+                        <h3 class="text-3xl font-bold text-[var(--text-dark)]">Usuario Delifast</h3>
+                        <p class="text-gray-600 text-lg">usuario@example.com</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+                        <h4 class="font-semibold text-[var(--text-dark)] text-xl mb-4">Información Personal</h4>
+                        <ul class="space-y-3 text-gray-700 text-lg">
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Nombre:</span>
+                                <span>Juan Pérez</span>
+                            </li>
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Teléfono:</span>
+                                <span>+51 987 654 321</span>
+                            </li>
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Dirección:</span>
+                                <span>Av. Siempre Viva 742</span>
+                            </li>
+                        </ul>
+                        <button class="text-[var(--light-purple)] mt-4 text-md">Editar Información</button>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+                        <h4 class="font-semibold text-[var(--text-dark)] text-xl mb-4">Configuración</h4>
+                        <ul class="space-y-3 text-gray-700 text-lg">
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Notificaciones</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" value="" class="sr-only peer" checked>
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-[var(--light-purple)] rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[var(--primary-purple)]"></div>
+                                </label>
+                            </li>
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Métodos de Pago</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </li>
+                            <li class="flex justify-between items-center py-2 border-b border-gray-100 last:border-b-0">
+                                <span>Ayuda y Soporte</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <button class="w-full bg-red-500 text-white primary-button rounded-full shadow-lg hover:bg-red-600 transition duration-200">
+                        Cerrar Sesión
+                    </button>
+                </div>
+            </section>
+        </div>
     </div>
 
     <script>
@@ -632,18 +683,18 @@
             screens.forEach(screen => screen.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
 
-            // Update active state in bottom nav
-            const navButtons = document.querySelectorAll('.navbar button');
-            navButtons.forEach(button => button.classList.remove('text-[var(--primary-purple)]', 'active-nav'));
+            // Update active state in sidebar nav
+            const navButtons = document.querySelectorAll('.sidebar button');
+            navButtons.forEach(button => button.classList.remove('text-[var(--primary-purple)]', 'bg-[var(--bg-light-purple)]', 'active-nav'));
             navButtons.forEach(button => {
                 const iconClass = button.querySelector('i').classList[1];
                 if ((screenId === 'homeScreen' && iconClass === 'fa-home') ||
                     (screenId === 'ordersScreen' && iconClass === 'fa-receipt') ||
                     (screenId === 'cartScreen' && iconClass === 'fa-shopping-cart') ||
                     (screenId === 'profileScreen' && iconClass === 'fa-user')) {
-                    button.classList.add('text-[var(--primary-purple)]', 'active-nav');
+                    button.classList.add('text-[var(--primary-purple)]', 'bg-[var(--bg-light-purple)]', 'active-nav');
                 } else {
-                    button.classList.add('text-gray-400', 'hover:text-[var(--light-purple)]');
+                    button.classList.add('text-gray-700', 'hover:bg-gray-100');
                 }
             });
 
@@ -758,14 +809,14 @@
             if (restaurant.menu && restaurant.menu.length > 0) {
                 restaurant.menu.forEach(item => {
                     const menuItemHtml = `
-                        <div class="flex items-center bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" onclick="showProductDetails('${restaurantId}', '${item.id}')">
-                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-20 h-20 object-cover rounded-md mr-4">
+                        <div class="flex items-center bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" onclick="showProductDetails('${restaurantId}', '${item.id}')">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-24 h-24 object-cover rounded-md mr-4">
                             <div class="flex-grow">
-                                <h4 class="font-semibold text-md text-[var(--text-dark)]">${item.name}</h4>
-                                <p class="text-sm text-gray-500 line-clamp-2">${item.description}</p>
-                                <p class="font-bold text-[var(--primary-purple)] mt-1">$${item.price.toFixed(2)}</p>
+                                <h4 class="font-semibold text-lg text-[var(--text-dark)]">${item.name}</h4>
+                                <p class="text-md text-gray-500 line-clamp-2">${item.description}</p>
+                                <p class="font-bold text-[var(--primary-purple)] mt-1 text-lg">$${item.price.toFixed(2)}</p>
                             </div>
-                            <button class="bg-[var(--accent-green)] text-white p-2 rounded-full text-sm ml-2 self-start"><i class="fas fa-plus"></i></button>
+                            <button class="bg-[var(--accent-green)] text-white p-3 rounded-full text-lg ml-2 self-start"><i class="fas fa-plus"></i></button>
                         </div>
                     `;
                     menuContainer.innerHTML += menuItemHtml;
@@ -798,7 +849,7 @@
             document.getElementById('productDescription').innerText = product.description;
             document.getElementById('productPrice').innerText = product.price.toFixed(2);
             document.getElementById('productQuantity').innerText = currentProductQuantity;
-            document.getElementById('totalProductPrice').innerText = (product.price * currentProductQuantity).toFixed(2);
+            document.getElementById('totalProductPrice').innerText = (currentProduct.price * currentProductQuantity).toFixed(2);
 
             showScreen('productDetailsScreen');
         }
@@ -842,18 +893,18 @@
                     const itemTotal = item.price * item.quantity;
                     subtotal += itemTotal;
                     const cartItemHtml = `
-                        <div class="flex items-center bg-white p-3 rounded-xl shadow-sm">
-                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-16 h-16 object-cover rounded-md mr-4">
+                        <div class="flex items-center bg-white p-4 rounded-xl shadow-sm">
+                            <img src="${item.image}" alt="${item.name}" onerror="this.onerror=null;this.src='https://placehold.co/150x100/6F2DBD/FFFFFF?text=Imagen+No+Disponible';" class="w-20 h-20 object-cover rounded-md mr-4">
                             <div class="flex-grow">
-                                <h4 class="font-semibold text-md text-[var(--text-dark)]">${item.name}</h4>
-                                <p class="text-sm text-gray-500">${item.restaurantName}</p>
-                                <p class="font-bold text-[var(--primary-purple)] mt-1">$${item.price.toFixed(2)}</p>
+                                <h4 class="font-semibold text-lg text-[var(--text-dark)]">${item.name}</h4>
+                                <p class="text-md text-gray-500">${item.restaurantName}</p>
+                                <p class="font-bold text-[var(--primary-purple)] mt-1 text-lg">$${item.price.toFixed(2)}</p>
                             </div>
                             <div class="flex items-center space-x-2 quantity-control">
-                                <button onclick="updateCartItemQuantity('${item.id}', -1)" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"><i class="fas fa-minus"></i></button>
-                                <span class="font-bold text-[var(--text-dark)]">${item.quantity}</span>
-                                <button onclick="updateCartItemQuantity('${item.id}', 1)" class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm"><i class="fas fa-plus"></i></button>
-                                <button onclick="removeCartItem('${item.id}')" class="text-red-500 ml-2 text-xl"><i class="fas fa-trash-alt"></i></button>
+                                <button onclick="updateCartItemQuantity('${item.id}', -1)" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-md"><i class="fas fa-minus"></i></button>
+                                <span class="font-bold text-[var(--text-dark)] text-xl">${item.quantity}</span>
+                                <button onclick="updateCartItemQuantity('${item.id}', 1)" class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-md"><i class="fas fa-plus"></i></button>
+                                <button onclick="removeCartItem('${item.id}')" class="text-red-500 ml-3 text-2xl"><i class="fas fa-trash-alt"></i></button>
                             </div>
                         </div>
                     `;
@@ -916,7 +967,7 @@
                 const itemTotal = item.price * item.quantity;
                 subtotal += itemTotal;
                 const summaryItemHtml = `
-                    <div class="flex justify-between items-center text-sm text-gray-700">
+                    <div class="flex justify-between items-center text-md text-gray-700">
                         <span>${item.name} x ${item.quantity}</span>
                         <span>$${itemTotal.toFixed(2)}</span>
                     </div>
@@ -928,13 +979,13 @@
             const total = subtotal + deliveryCost;
 
             const subtotalLine = `
-                <div class="flex justify-between items-center text-md font-semibold text-[var(--text-dark)] mt-2 border-t border-gray-100 pt-2">
+                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)] mt-3 border-t border-gray-100 pt-3">
                     <span>Subtotal:</span>
                     <span>$${subtotal.toFixed(2)}</span>
                 </div>
             `;
             const deliveryLine = `
-                <div class="flex justify-between items-center text-md font-semibold text-[var(--text-dark)]">
+                <div class="flex justify-between items-center text-lg font-semibold text-[var(--text-dark)]">
                     <span>Envío:</span>
                     <span>$${deliveryCost.toFixed(2)}</span>
                 </div>
@@ -976,11 +1027,11 @@
 
             categories.forEach(category => {
                 const categoryCardHtml = `
-                    <div class="category-card flex flex-col items-center p-3 bg-white rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" data-category-type="${category.type}">
-                        <div class="w-14 h-14 bg-[var(--bg-light-purple)] rounded-full flex items-center justify-center mb-2">
-                            <i class="${category.icon} text-xl text-[var(--primary-purple)]"></i>
+                    <div class="category-card flex flex-col items-center p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition cursor-pointer" data-category-type="${category.type}">
+                        <div class="w-16 h-16 bg-[var(--bg-light-purple)] rounded-full flex items-center justify-center mb-2">
+                            <i class="${category.icon} text-2xl text-[var(--primary-purple)]"></i>
                         </div>
-                        <span class="text-sm font-medium text-[var(--gray-text)]">${category.name}</span>
+                        <span class="text-md font-medium text-[var(--gray-text)]">${category.name}</span>
                     </div>
                 `;
                 categoryGrid.innerHTML += categoryCardHtml;
@@ -990,7 +1041,7 @@
             categoryGrid.addEventListener('click', (event) => {
                 const clickedCard = event.target.closest('.category-card');
                 if (clickedCard) {
-                    const categoryType = clickedCard.dataset.categoryType;
+                    const categoryType = clickedCard.dataset.category-type;
                     loadCategory(categoryType);
                 }
             });
